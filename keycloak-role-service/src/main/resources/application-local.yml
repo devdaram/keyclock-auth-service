@@ -1,0 +1,26 @@
+#spring:
+#  datasource:
+#    url: jdbc:mariadb://192.168.101.188:3306/NMS
+#    username: nms
+#    password: nms
+#    driver-class-name: org.mariadb.jdbc.Driver
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: ${app.oauth.uri}/auth/realms/PNMS
+#
+#app:
+#  datasource:
+#    secondary:
+#      url: jdbc:mariadb://192.168.101.188:3306/NMS
+#      username: nms
+#      password: nms
+#      driver-class-name: org.mariadb.jdbc.Driver
+#  oauth:
+#    uri: https://dev.pnms.t-sdn.com:9360
+
+logging:
+  level:
+    com: debug
+    org: debug

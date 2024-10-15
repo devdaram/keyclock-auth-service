@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE configuration>
+<configuration>
+    <springProperty name="LOG_FILE" source="logging.file"></springProperty>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <springProfile name="LOG_CONSOLE">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>common</pattern>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <springProfile name="LOG_FILE">
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="net.logstash.logback.encoder.AccessEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <fieldName>timestamp</fieldName>
+                    </timestamp>
+                    <method/>
+                    <statusCode/>
+                    <elapsedTime/>
+                    <protocol/>
+                    <remoteHost/>
+                    <remoteUser/>
+                    <contentLength/>
+                    <requestHeaders>
+                        <fieldName>request_headers</fieldName>
+                    </requestHeaders>
+                    <responseHeaders>
+                        <fieldName>response_headers</fieldName>
+                    </responseHeaders>
+                    <pattern>
+                        <pattern>
+                            {
+                            "hostname":"${HOSTNAME}",
+                            "requested_uri":"%requestURI%queryString",
+                            "request_content":"%.-1024requestContent",
+                            "response_content":"%.-1024responseContent"
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+            </encoder>
+            <file>${LOG_FILE}.access.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.access.log.%d{yyyy-MM-dd_HH}.%i.gz</fileNamePattern>
+                <maxFileSize>${LOG_FILE_MAX_SIZE:-1GB}</maxFileSize>
+                <maxHistory>${LOG_FILE_MAX_HISTORY:-365}</maxHistory>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                <evaluator>
+                    <expression>
+                        <![CDATA[event.getRequestURI().startsWith("/swagger") || event.getRequestURI().startsWith("/webjars")]]>
+                    </expression>
+                </evaluator>
+                <onMatch>DENY</onMatch>
+            </filter>
+        </appender>
+    </springProfile>
+
+    <appender name="ASYNC" class="net.logstash.logback.appender.AccessEventAsyncDisruptorAppender">
+        <springProfile name="LOG_FILE">
+            <appender-ref ref="FILE"/>
+        </springProfile>
+    </appender>
+
+    <appender-ref ref="ASYNC"/>
+</configuration>

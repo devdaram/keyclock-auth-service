@@ -1,0 +1,19 @@
+spring:
+#  datasource:
+#    hikari:
+#      driverClassName: com.mysql.jdbc.Driver
+#      jdbc-url: jdbc:mysql://192.168.101.187:3306/NMS?allowMultiQueries=true
+#      username: nmsuser
+#      password: nmsuser123
+#      connection-timeout: 30000
+
+  logging:
+    level:
+      com: debug
+      org: info
+    file:
+      name: ${logging.file.path}/${service.name:${spring.application.name}}.service.log
+      #path: /home/nms/NMS_004/log/${spring.application.name}
+      path: logs
+    pattern:
+      console:
